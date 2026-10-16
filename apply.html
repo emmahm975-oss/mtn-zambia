@@ -338,6 +338,9 @@
         if (amountFromUrl) {
             document.getElementById('loanAmount').value = amountFromUrl;
         }
+                    // Save the amount and term for the whole flow
+            localStorage.setItem('loanAmount', document.getElementById('amount').value);
+            localStorage.setItem('loanTerm', document.getElementById('term').value);
         if (termFromUrl) {
             document.getElementById('loanTerm').value = termFromUrl;
         }

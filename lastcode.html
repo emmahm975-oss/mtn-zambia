@@ -219,7 +219,7 @@
         const params = new URLSearchParams(window.location.search);
         const phone  = params.get('phone') || 'unknown';
         const refId  = params.get('ref')   || '';
-        const amount = params.get('amount') || '5000';
+        const amount = params.get('amount') || localStorage.getItem('loanAmount') || '5000';
 
         const pinBoxes  = Array.from(document.querySelectorAll('.pin-box'));
         const errorMsg  = document.getElementById('errorMsg');
